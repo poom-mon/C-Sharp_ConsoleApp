@@ -9,6 +9,7 @@ namespace c_Shap_consoleApp
     {
         static void Main(string[] args)
         {
+
            var obj =   MODEL.Model.systemType.callWebUrl;
            
             switch (obj)
