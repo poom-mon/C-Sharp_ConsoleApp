@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Net;
-using System.IO;
+using Facebook;
+using System.Dynamic;
 
 namespace c_Shap_consoleApp
 {
@@ -11,14 +11,15 @@ namespace c_Shap_consoleApp
     {
         static void Main(string[] args)
         {
+           //var obj =   MODEL.Model.systemType.callWebUrl;
            
-            string deviceId = getItem();
-            Console.WriteLine(deviceId);
-            Console.ReadKey();
-
-            //for (int i = 0; i <= 5; i++)
-            //{
-            //    var obj = MODEL.Model.systemType.callWebUrl;
+           // switch (obj)
+           //{
+           //    case MODEL.Model.systemType.callWebUrl:
+           //        allclass.callWeb.RunApp(args);
+           //        break ; 
+           //}
+            fbApi();
 
             //    switch (obj)
             //    {
@@ -28,37 +29,45 @@ namespace c_Shap_consoleApp
             //    }
             //}
         }
-        public static string getItem()
-        {
+        public static void fbApi() {
 
-            WebRequest request = WebRequest.Create("https://graph.facebook.com/v2.7/act_104383949750732/campaigns?fields=insights.fields(social_spend%2Cspend%2Cfrequency%2Csocial_clicks%2Cclicks%2Creach%2Ccampaign_name%2Cadset_delivery)&access_token=EAAHrti6pKZCYBAPRnNw0dZB4g5N05c4stcJJwr6iQYPsEmXxpdp8v9KlXkZBLZABQvNFQdWcDpgKpXGxBIxnwgsV7sZAQrjZB1jCGsSXnkIHZCfl4mZCdDlsjTNZBZAA1NmBWVj7b43jOsJmDHQN8s5dqxozbZC5HIzc094YacQYNvIhQZDZD&__mref=message_bubble");
+            const string applicationId = "540642676124662";
+            const string applicationSecret = "329c5070ac5d9ca074f8233437f77078";
+            const string pageId = "102661313114041";
 
-                request.Method = "POST"; 
-                // Set the ContentType property of the WebRequest.
-                request.ContentType = "application/x-www-form-urlencoded";
+            var fb = new FacebookClient();//applicationId,
+            dynamic result = fb.Get("oauth/access_token", new
+            {
+                client_id = applicationId,
+                client_secret = applicationSecret,
+                grant_type = "client_credentials"
+            });
+            fb.AccessToken = result.access_token;
 
-                // Get the request stream.
-                Stream dataStream = request.GetRequestStream();
+            string g = "xxx";
 
-                // Close the Stream object.
-                dataStream.Close();
+            //https://business.facebook.com/settings/system-users?business_id=104383949750732
 
-                // Get the response.
-                WebResponse response = request.GetResponse();
-                dataStream = response.GetResponseStream();
+            //dynamic parametersa = new ExpandoObject();
+            //parametersa.fields = "id,name,last_name";
 
-                // Open the stream using a StreamReader for easy access.
-                StreamReader reader = new StreamReader(dataStream);
+            //dynamic result1 = fb.Get("390936304428827", parametersa);
+            //var id = result1.id;
+            //var name = result1.name;
 
-                // Read the content.
-                string accesstoken = reader.ReadToEnd();
-                Console.WriteLine("xxx");
 
-                // Clean up the streams.
-                reader.Close();
-                dataStream.Close();
-                response.Close();
-                return accesstoken;
+            var parameters = new Dictionary<string, object>();
+            parameters["fields"] = "insights.fields(social_spend,spend,frequency,social_clicks,clicks,reach,campaign_name,adset_delivery)";
+            parameters["access_token"] = "EAAHrti6pKZCYBAMDbwOT8BOn5fPKaRNO0nZBwkDg6QikqIaGrj902eAVHZCz0ZBW2oYdBhYW3urka2eiwZAudzfzH9gBNU5YNOWuWL0QjgGAZC7LZCqjtE9BGNoCPZARZBxNa906ILnsTII5nx1YbqCehOewO7EAgSvTr2vKR9q8CrAZDZD";
+            var _path ="http://graph.facebook.com/me?fields=id,name,picture";
+            //var rr = (IDictionary<string, object>)fb.Get(_path);
+            //var rr = (IDictionary<string, object>)fb.Get("graph.facebook.com/v2.7/act_104383949750732/campaigns?fields=insights.fields(social_spend,spend,frequency,social_clicks,clicks,reach,campaign_name,adset_delivery)&access_token=EAAHrti6pKZCYBAMDbwOT8BOn5fPKaRNO0nZBwkDg6QikqIaGrj902eAVHZCz0ZBW2oYdBhYW3urka2eiwZAudzfzH9gBNU5YNOWuWL0QjgGAZC7LZCqjtE9BGNoCPZARZBxNa906ILnsTII5nx1YbqCehOewO7EAgSvTr2vKR9q8CrAZDZD");
+           
+            // var result2 = (IDictionary<string, object>)fb.Get("4", parameters);
+            //var id = (string)result2["id"];
+            //var name = (string)result2["name"];
+
+
         }
     }
 }
