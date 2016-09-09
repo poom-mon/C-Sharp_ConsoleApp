@@ -23,8 +23,8 @@ namespace c_Shap_consoleApp
            //}   
             
             allclass.cCallFacebook a = new allclass.cCallFacebook();
-            a.getChatFacebook();  
-
+             a.getCon2();  
+            a.matchPhone("สวัสดีครับ เบอผมเบอร์ 083-2640621 ครับบบบบ");
         }   
 
     }
