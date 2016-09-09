@@ -38,6 +38,7 @@ namespace c_Shap_consoleApp
 
             string g = "xxx";
 
+
             //https://business.facebook.com/settings/system-users?business_id=104383949750732
 
             //dynamic parametersa = new ExpandoObject();
