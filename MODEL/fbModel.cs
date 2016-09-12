@@ -22,6 +22,11 @@ namespace MODEL
         {
             public DateTime startDate { get; set; }
             public DateTime endDate { get; set; }
+            public node nodetype { get; set; }
         } 
+        public enum node{
+          mother,
+          child
+        }
 
 }

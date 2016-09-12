@@ -103,39 +103,16 @@ namespace c_Shap_consoleApp.allclass
             }
         }
 
+         
 
-
-        public object getConversion() {
-            DateTime dt = DateTime.Now;
-
-            return null;
-        }
-
-        public List<objChat> getCon2()
+        public List<objChat> getConversation(DateTime dtStart,DateTime dtEnd)
         {
             try
-            {
-                var fb = new FacebookClient(AccessToken) { AppId = AppId, AppSecret = AppSecrete }; 
-
-                DateTime dtStart = DateTime.Now, dtEnd = DateTime.Now;
-                dtStart = new DateTime(dtStart.Year, dtStart.Month, dtStart.Day, 0, 0, 0); //01:00:00 AM
-                dtEnd = new DateTime(dtEnd.Year, dtEnd.Month, dtEnd.Day, 23, 59, 59); //01:00:00 AM
-
-
-                dynamic results = fb.Get("silkspan/?fields=conversations");
-
-                List<objChat> _objchat = new List<objChat>(); 
-                 
-                generateObjChat(results, ref _objchat,
-                       new objPassValue(){ startDate = dtStart , endDate =dtEnd });
-
-                
-              //  dynamic results222 = fb.Get("t_mid.1458116143347:c6e07ab5f509750622"); 
-
-                var a = results.conversations.paging.next;
-                var b = results.conversations.paging.previous;  
-                 
-                
+            {   
+                List<objChat> _objchat = new List<objChat>();    
+                queryConversation(ref _objchat
+                  ,new objPassValue(){ startDate = dtStart , endDate =dtEnd ,nodetype = node.mother }
+                  ,"silkspan/?fields=conversations");
                
                 return _objchat;
             }
@@ -146,89 +123,101 @@ namespace c_Shap_consoleApp.allclass
                 return null;
             }
         }
-        private void recusive(ref List<objChat> _objchat, objPassValue objPassValue)
-        {
-            dynamic results = excuteGraph("silkspan/?fields=conversations");
-            var _next = results.conversations.paging.next;
-            var _previous = results.conversations.paging.previous; 
-          
+        private void queryConversation(ref List<objChat> _objchat, objPassValue objPassValue, String url)
+        {// recusive in Node next
+            dynamic results = excuteGraph(url);
 
-        }
-         
+            String _next = "";
+            if (objPassValue.nodetype == node.mother)  
+                _next = results.conversations.paging.next;
+            else
+                _next = results.paging.next; 
 
-        private void generateObjChat(dynamic results, ref List<objChat> _objchat, objPassValue objPassValue)
-        { 
-            foreach (dynamic result in results.conversations.data)
+            bool _enprocess = true;
+            generateObjChat(results, ref _objchat, objPassValue, ref _enprocess);
+
+            string g = "";
+            if (_enprocess == true)
             {
-                var _obj_id = result.id;
-                var _updatetime = result.updated_time;
+                objPassValue.nodetype = node.child;
+                queryConversation(ref _objchat, objPassValue, _next); 
+            } 
+        } 
+         
+        private void generateObjChat(dynamic results, ref List<objChat> _objchat, objPassValue objPassValue,ref bool endprocess)
+        { 
+            if (objPassValue.nodetype == node.mother) {
+                results = results.conversations;
+            }
+            foreach (dynamic result in results.data) 
+            { 
+               var _obj_id = result.id;
+               var _updatetime = result.updated_time;
 
-                DateTime _update = DateTime.Parse(_updatetime);  //"2016-09-09T10:17:46+0000" 
-                if (_update >= objPassValue.startDate && _update <= objPassValue.endDate)
-                {
-                    var g = "";
-                    // อยู่ในเงือนไขวันไปต่อ
-                }
-                else
-                {
-                    var cccc = _updatetime; 
-                    break;// ไม่อยู่ในเงือนไขวันให้จบ
-                }
+               DateTime _update = DateTime.Parse(_updatetime);  //"2016-09-09T10:17:46+0000"  
 
+               if (objPassValue.startDate >= _update)
+                {// วันที่ update facebook <  วันที่เริ่ม
+                    endprocess = false;
+                    break; 
+                }
                 foreach (var g in result.messages.data)
-                { // วน message  
-
-                    var _comment = "";
-                    if (g.message == "")
-                    {
-                        dynamic _obattact = g[6].data[0];
-                        if (_obattact[0] == null)
-                        { //sticker   
-                            _comment += "<img class=\"_comment_sticker\" src='" + g[6].data[0].link + "' />";
-                        }
-                        else
+                { // วน message    
+                        var _comment = "";
+                        if (g.message == "")
                         {
-                            dynamic _filetype = _obattact.mime_type;
-                            if (_filetype.Contains("image")) // image attact
-                            {
-                                var _urlimage = g[6][0][0].image_data.url;
-                                _comment += "<img class=\"_comment_picture\" src='" + _urlimage + "' />";
+                            dynamic _obattact = g[6].data[0];
+                            if (_obattact[0] == null)
+                            { //sticker   
+                                _comment += "<img class=\"_comment_sticker\" src='" + g[6].data[0].link + "' />";
                             }
                             else
                             {
-                                _comment += ";[@attachfile][name=" + g[6][0][0].image_data.name + "]" + g[6][0][0].image_data.file_url;
+                                dynamic _filetype = _obattact.mime_type;
+                                if (_filetype.Contains("image")) // image attact
+                                {
+                                    var _urlimage = g[6][0][0].image_data.url;
+                                    _comment += "<img class=\"_comment_picture\" src='" + _urlimage + "' />";
+                                }
+                                else
+                                {
+                                    _comment += ";[@attachfile][name=" + g[6][0][0].name + "]" + g[6][0][0].file_url;
+                                }
                             }
                         }
-                    }
-                    else
-                    {
-                        _comment = g.message; 
-                    }
+                        else
+                        {
+                            _comment = g.message;
+                        }
 
-                    var gto = g.to.data[0].id;
-                    var gnameto = g.to.data[0].name;
-                    var gform = g.from.id;
-                    var gnamefrom = g.from.name;
-                    var createdate = g.created_time;
-                    var _post_id = g.id;
+                        var gto = g.to.data[0].id;
+                        var gnameto = g.to.data[0].name;
+                        var gform = g.from.id;
+                        var gnamefrom = g.from.name;
+                        var createdate = g.created_time;
+                        var _post_id = g.id;
 
-                    string _phone = (gform == "55269232341" ? "" : matchPhone(_comment));
+                        DateTime _createdate = DateTime.Parse(createdate);
+                        if (objPassValue.startDate >=  _createdate   )
+                        { 
+                            break;// node การสนทนาข้างในวันที่เริ่มต้องมากกว่าวันที่ สร้าง
+                        } 
+                        string _phone = (gform == "55269232341" ? "" : matchPhone(_comment));
 
-                    _objchat.Add(new objChat()
-                    {
-                        id_facebook = gform,
-                        name_facebook = gnamefrom,
-                        comment = _comment,
-                        phone = _phone,
-                        action_date = createdate,
-                        id_facebook_to = gto,
-                        name_facebook_to = gnameto,
-                        action_status = "inbox",
-                        obj_id = _obj_id,
-                        post_id = _post_id
-                    });
-
-                }
+                        _objchat.Add(new objChat()
+                        {
+                            id_facebook = gform,
+                            name_facebook = gnamefrom,
+                            comment = _comment,
+                            phone = _phone,
+                            action_date = createdate,
+                            id_facebook_to = gto,
+                            name_facebook_to = gnameto,
+                            action_status = "inbox",
+                            obj_id = _obj_id,
+                            post_id = _post_id
+                        });
+                    } 
             }
         }
          
