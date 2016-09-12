@@ -6,7 +6,7 @@ using Facebook;
 using System.Net;
 using System.IO;
 using System.Text.RegularExpressions;
-using System.Globalization;
+using MODEL; 
 
 namespace c_Shap_consoleApp.allclass
 {
@@ -20,6 +20,7 @@ namespace c_Shap_consoleApp.allclass
         public static string AccessToken = "EAAWh0ZAZAHVgcBAPg3Bdos3pMpTR7eh74oAstDZCxoT2NcWZCjhVyyT2ZAefuqPNm7gqpviNTXhxMeMGKbHNA2RFpofnTf4J7eltovAT9p1vWWj0BsMNRoEXygGocFzdgUphobT2AZB53Bai3ZBQkDZBaFZB0ZAIn4pkLKujnum2NAOQZDZD";
         public static string AppId = "1585296425047559";
         public static string AppSecrete = "bc2c8d0d5a808d54dd3368b00f627689";
+         
 
         /***
          remark: 
@@ -110,13 +111,11 @@ namespace c_Shap_consoleApp.allclass
             return null;
         }
 
-        public object getCon2()
+        public List<objChat> getCon2()
         {
             try
             {
-                var fb = new FacebookClient(AccessToken) { AppId = AppId, AppSecret = AppSecrete };
-                List<object> _lisObj = new List<object>();
-                List<object> _lisObj2 = new List<object>();
+                var fb = new FacebookClient(AccessToken) { AppId = AppId, AppSecret = AppSecrete }; 
 
                 DateTime dtStart = DateTime.Now, dtEnd = DateTime.Now;
                 dtStart = new DateTime(dtStart.Year, dtStart.Month, dtStart.Day, 0, 0, 0); //01:00:00 AM
@@ -125,114 +124,19 @@ namespace c_Shap_consoleApp.allclass
 
                 dynamic results = fb.Get("silkspan/?fields=conversations");
 
+                List<objChat> _objchat = new List<objChat>(); 
+                 
+                generateObjChat(results, ref _objchat,
+                       new objPassValue(){ startDate = dtStart , endDate =dtEnd });
+
+                
               //  dynamic results222 = fb.Get("t_mid.1458116143347:c6e07ab5f509750622"); 
 
                 var a = results.conversations.paging.next;
                 var b = results.conversations.paging.previous;  
-
-                //dynamic results2 = fb.Get(a);
-                //var b = results[1].next;
-                //foreach (object result in results2.data)
-                //{
-                //    _lisObj2.Add(result);
-                //}
-                //var c = results2[1].next; 
                  
-                 
-                List<objChat> _objchat = new List<objChat>();
-                int count = 1;
-                foreach (dynamic result in results.conversations.data) 
-                { 
-                    var _obj_id = result.id;
-                    var _updatetime = result.updated_time;
-
-                    //"2016-09-09T10:17:46+0000"
-
-                     string strdate = _updatetime;
-                    int yy = Convert.ToInt32(strdate.Split('-')[0]);
-
-                    string a1= strdate.Split('-')[0];
-                    string a2= strdate.Split('-')[1];
-                    string c = strdate.Split('-')[2];// 09T10:21:57+0000
-                    string d = strdate.Split(':')[0]; //2016-09-09T10
-                    string e= strdate.Split(':')[1];
-                    string f= strdate.Split(':')[2];
-
-                    var dt = DateTime.Parse(_updatetime);
-                    string output = dt.ToString(@"MM/dd/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
-
-
-                   // DateTime dtm = new DateTime(
-                   //         Convert.ToInt32(strdate.Split('-')[0]) , 
-                   //         Convert.ToInt32(strdate.Split('-')[1]) , 
-                   //         Convert.ToInt32(strdate.Split('-')[2]) , 
-
-                   //);
-                     
-                    if(_updatetime >= dtStart && _updatetime <= dtEnd)
-                    {
-                        var g  ="";
-                    }
-                    else {
-                        var cccc = _updatetime;
-                        count++;
-                    }
-                 
-
-                    foreach(var g in result.messages.data){ // วน message  
-
-                            var _comment = "";
-                            if (g.message == "")
-                            { 
-                              dynamic _obattact = g[6].data[0]; 
-                              if (_obattact[0] == null)
-                              {
-                                  //sticker  
-                                 // var _linkstatu = g[6].data[0].link;
-                                   _comment += "<img class=\"_comment_sticker\" src='" + g[6].data[0].link + "' />";
-                              }
-                              else
-                              { 
-                                  dynamic _filetype = _obattact.mime_type;  
-                                  if (_filetype.Contains("image")) // image attact
-                                  { 
-                                      var _urlimage = g[6][0][0].image_data.url;  
-                                      _comment += "<img class=\"_comment_picture\" src='" + _urlimage + "' />";
-                                  }
-                                  else {
-                                      _comment += ";[@attachfile][name=" + g[6][0][0].image_data.name + "]" + g[6][0][0].image_data.file_url;
-                                  }  
-                              } 
-                        }
-                        else
-                        {
-                            _comment = g.message;
-                            _lisObj.Add(g.message);
-                        }
-
-                        var gto = g.to.data[0].id;
-                        var gname = g.to.data[0].name;
-                        var gform = g.from.id;
-                        var createdate = g.created_time; 
-                        var _post_id = g.id; 
-
-                        string _phone = (gform == "55269232341" ? "" : matchPhone(_comment));
-                       
-                        _objchat.Add(new objChat() {
-                            id_facebook = gform,
-                            name_facebook = gname,
-                            comment = _comment,
-                            phone  = _phone ,
-                            action_date = createdate,
-                            id_facebook_to  = gto,
-                            name_facebook_to = gname,
-                            action_status = "inbox"  ,
-                            obj_id = _obj_id ,
-                            post_id = _post_id 
-                        });
-
-                    }
-                }
+                
+               
                 return _objchat;
             }
             catch (Exception ex)
@@ -242,6 +146,92 @@ namespace c_Shap_consoleApp.allclass
                 return null;
             }
         }
+        private void recusive(ref List<objChat> _objchat, objPassValue objPassValue)
+        {
+            dynamic results = excuteGraph("silkspan/?fields=conversations");
+            var _next = results.conversations.paging.next;
+            var _previous = results.conversations.paging.previous; 
+          
+
+        }
+         
+
+        private void generateObjChat(dynamic results, ref List<objChat> _objchat, objPassValue objPassValue)
+        { 
+            foreach (dynamic result in results.conversations.data)
+            {
+                var _obj_id = result.id;
+                var _updatetime = result.updated_time;
+
+                DateTime _update = DateTime.Parse(_updatetime);  //"2016-09-09T10:17:46+0000" 
+                if (_update >= objPassValue.startDate && _update <= objPassValue.endDate)
+                {
+                    var g = "";
+                    // อยู่ในเงือนไขวันไปต่อ
+                }
+                else
+                {
+                    var cccc = _updatetime; 
+                    break;// ไม่อยู่ในเงือนไขวันให้จบ
+                }
+
+                foreach (var g in result.messages.data)
+                { // วน message  
+
+                    var _comment = "";
+                    if (g.message == "")
+                    {
+                        dynamic _obattact = g[6].data[0];
+                        if (_obattact[0] == null)
+                        { //sticker   
+                            _comment += "<img class=\"_comment_sticker\" src='" + g[6].data[0].link + "' />";
+                        }
+                        else
+                        {
+                            dynamic _filetype = _obattact.mime_type;
+                            if (_filetype.Contains("image")) // image attact
+                            {
+                                var _urlimage = g[6][0][0].image_data.url;
+                                _comment += "<img class=\"_comment_picture\" src='" + _urlimage + "' />";
+                            }
+                            else
+                            {
+                                _comment += ";[@attachfile][name=" + g[6][0][0].image_data.name + "]" + g[6][0][0].image_data.file_url;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        _comment = g.message; 
+                    }
+
+                    var gto = g.to.data[0].id;
+                    var gnameto = g.to.data[0].name;
+                    var gform = g.from.id;
+                    var gnamefrom = g.from.name;
+                    var createdate = g.created_time;
+                    var _post_id = g.id;
+
+                    string _phone = (gform == "55269232341" ? "" : matchPhone(_comment));
+
+                    _objchat.Add(new objChat()
+                    {
+                        id_facebook = gform,
+                        name_facebook = gnamefrom,
+                        comment = _comment,
+                        phone = _phone,
+                        action_date = createdate,
+                        id_facebook_to = gto,
+                        name_facebook_to = gnameto,
+                        action_status = "inbox",
+                        obj_id = _obj_id,
+                        post_id = _post_id
+                    });
+
+                }
+            }
+        }
+         
 
 
         public string matchPhone(string _comment)
@@ -259,18 +249,6 @@ namespace c_Shap_consoleApp.allclass
 
     }
 
-    public class objChat 
-    {
-        public string id_facebook { get; set; }
-        public string name_facebook{ get; set; }
-        public string comment { get; set; }
-        public string phone { get; set; }
-        public string action_date { get; set; }
-        public string id_facebook_to { get; set; }
-        public string name_facebook_to { get; set; }
-        public string action_status { get; set; }
-        public string obj_id { get; set; }
-        public string post_id { get; set; }  
-    }
+    
 
 }
