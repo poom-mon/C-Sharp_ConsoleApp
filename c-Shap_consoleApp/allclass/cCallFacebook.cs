@@ -156,7 +156,7 @@ namespace c_Shap_consoleApp.allclass
 
                DateTime _update = DateTime.Parse(_updatetime);  //"2016-09-09T10:17:46+0000"  
 
-               if (objPassValue.startDate >= _update)
+               if (objPassValue.startDate >= _update || _update >= objPassValue.endDate)
                 {// วันที่ update facebook <  วันที่เริ่ม
                     endprocess = false;
                     break; 
@@ -198,7 +198,11 @@ namespace c_Shap_consoleApp.allclass
                         var _post_id = g.id;
 
                         DateTime _createdate = DateTime.Parse(createdate);
-                        if (objPassValue.startDate >=  _createdate   )
+                        if (createdate.Contains("2016-09-12T23:59:47+0000"))
+                        {
+                            var cc = "";
+                        }
+                        if (objPassValue.startDate >= _createdate || _createdate >= objPassValue.endDate)
                         { 
                             break;// node การสนทนาข้างในวันที่เริ่มต้องมากกว่าวันที่ สร้าง
                         } 
@@ -233,6 +237,30 @@ namespace c_Shap_consoleApp.allclass
                 phone = match.Value;
 	        }
             return phone;
+        }
+        public DateTime? cDatetimeFormat(String _datetime) {
+            try
+            {
+                if (_datetime == "")
+                {
+                    Console.WriteLine("datetime parameter is null , please check your parameter ! ");
+                    return null;
+                }
+                else
+                {
+                    //datetime formath : "2016-09-12T23:59:47+0000" 
+                    var time = _datetime.Substring(11, 8);
+                    var _date = _datetime.Substring(0, 10);
+
+                    TimeSpan _tm = TimeSpan.Parse(time);
+                    DateTime _createdate = DateTime.Parse(_date);
+                    return _createdate.Add(_tm);
+                }
+            }
+            catch (Exception ex) {
+                Console.WriteLine(" conver data error , please check your parameter : \n" + ex);
+                return null;
+            }
         }
 
 
