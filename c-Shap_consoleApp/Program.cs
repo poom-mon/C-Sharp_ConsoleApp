@@ -35,7 +35,7 @@ namespace c_Shap_consoleApp
 
              DateTime dtStart = DateTime.Now, dtEnd = DateTime.Now;
              dtStart = new DateTime(dtStart.Year, dtStart.Month, dtStart.Day, 01, 00, 00); //01:00:00 AM
-             dtEnd = new DateTime(dtEnd.Year, dtEnd.Month, dtEnd.Day, 23, 59, 59); //01:00:00 AM
+             dtEnd = new DateTime(dtEnd.Year, dtEnd.Month, dtEnd.Day, 18, 59, 59); //01:00:00 AM
 
             allclass.cCallFacebook a = new allclass.cCallFacebook();
             List<objChat> g = (a.getConversation(dtStart, dtEnd)); 
