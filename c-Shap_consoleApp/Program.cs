@@ -29,10 +29,8 @@ namespace c_Shap_consoleApp
 
                 
             // Console.WriteLine(dt1.CompareTo(dt2));
-            // Console.WriteLine(dt2.CompareTo(dt1));
-
-
-
+            // Console.WriteLine(dt2.CompareTo(dt1)); 
+             
              DateTime dtStart = DateTime.Now, dtEnd = DateTime.Now;
              dtStart = new DateTime(dtStart.Year, dtStart.Month, dtStart.Day, 01, 00, 00); //01:00:00 AM
              dtEnd = new DateTime(dtEnd.Year, dtEnd.Month, dtEnd.Day, 18, 59, 59); //01:00:00 AM
@@ -51,8 +49,7 @@ namespace c_Shap_consoleApp
 
                 Console.WriteLine(_nth);
                 Console.WriteLine("=======================");
-            }
-            
+            } 
             Console.ReadKey();
            // a.matchPhone("สวัสดีครับ เบอผมเบอร์ 083-2640621 ครับบบบบ");
 

@@ -156,7 +156,7 @@ namespace c_Shap_consoleApp.allclass
 
                DateTime _update = DateTime.Parse(_updatetime);  //"2016-09-09T10:17:46+0000"  
 
-               if (objPassValue.startDate <= _update || _update >= objPassValue.endDate)
+               if (objPassValue.startDate >= _update)
                 {// วันที่ update facebook <  วันที่เริ่ม
                     endprocess = false;
                     break; 
@@ -198,7 +198,7 @@ namespace c_Shap_consoleApp.allclass
                         var _post_id = g.id;
 
                         DateTime _createdate = DateTime.Parse(createdate);
-                        if (objPassValue.startDate <= _createdate || _createdate >= objPassValue.endDate)
+                        if (objPassValue.startDate >=  _createdate   )
                         { 
                             break;// node การสนทนาข้างในวันที่เริ่มต้องมากกว่าวันที่ สร้าง
                         } 

@@ -58,6 +58,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="file\System Analysis and Design 9e - Shelly Cashman.pdf" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
